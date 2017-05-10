@@ -99,7 +99,3 @@ ENV/
 .idea/
 db.sqlite3
 manage.py
-static-storage/
-templates/
-tweetMe/
-tweets/
