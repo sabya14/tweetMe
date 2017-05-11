@@ -1,5 +1,6 @@
-<body>
+{% extends "base.html" %}
 {% include 'tweets/search_form.html' %}
+{% block content %}
 {% for obj in object_list %}
     {{ obj.content }}<br>
     {{ obj.user }}<br>
@@ -12,4 +13,4 @@
         <li>No Tweets Yet</li>
     {% endif %}
 {% endfor %}
-</body>
+{% endblock content %}
