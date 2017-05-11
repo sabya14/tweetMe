@@ -6,7 +6,7 @@ from .views import home
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^tweets/', include('tweets.urls'), name='home'),
+    url(r'^tweets/', include('tweets.urls',namespace='tweet'), name='home'),
 ]
 
 if settings.DEBUG:

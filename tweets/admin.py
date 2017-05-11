@@ -4,7 +4,7 @@ from .forms import TweetModelForm
 
 
 class TweetModelAdmin(admin.ModelAdmin):
-    form = TweetModelForm
+    # form = TweetModelForm
     class Meta:
         model = Tweet
 
