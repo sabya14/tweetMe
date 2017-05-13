@@ -1,16 +1,140 @@
 {% extends "base.html" %}
-{% include 'tweets/search_form.html' %}
+{% block script %}
+    <script>
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        var router = new VueRouter({
+            mode: 'history',
+            routes: []
+
+        });
+        console.log(window.location.href)
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        var csrftoken = getCookie('csrftoken');
+
+        var config = {
+            headers: {'X-CSRFToken': csrftoken}
+        };
+
+        var vm =  new Vue({
+            router,
+            el: '#app',
+            data: {
+                tweets: [],
+                query:'',
+                content:'',
+            },
+            methods: {
+                postTweet : function (e) {
+                    e.preventDefault()
+                    content = this.content
+                    this.content = ""
+                    axios.post('/tweets/api/create/',
+                        {
+                            'username' : '{{ request.user }}',
+                            'content' : content
+                        },config) .then(function(response){
+
+                        $.ajax({
+                            url: '/tweets/api/',
+                            method: 'GET',
+                            success: function (data) {
+                                $.each(data, function (key, value) {
+                                    var tweetkey = key
+                                    var tweetUser = value.user
+                                    var tweetContent = value.content
+
+                                })
+                                vm.tweets = data;
+                                vm.query = q
+                            },
+                            error: function (data) {
+                                console.log('error')
+                            }
+                        })
+                    });
+
+                },
+
+            },
+            delimiters:  ['${', '}'],
+            mounted: function() {
+                q = this.$route.query.q
+                if (this.$route.query.q ==null)
+                    q = ''
+
+                $.ajax({
+                    url: '/tweets/api/?q=',
+                    data: {
+                        'q':q
+                    },
+                    method: 'GET',
+                    success: function (data) {
+                        $.each(data, function (key, value) {
+                            var tweetkey = key
+                            var tweetUser = value.user
+                            var tweetContent = value.content
+
+                        })
+                        vm.tweets = data;
+                        vm.query = q
+                    },
+                    error: function (data) {
+                        console.log('error')
+                    }
+                })
+            },
+
+        });
+
+    </script>
+
+{% endblock script %}
 {% block content %}
-{% for obj in object_list %}
-    {{ obj.content }}<br>
-    {{ obj.user }}<br>
-    {{ obj.updated }}<br>
-    {{ obj.timestamp }}<br>
-{% empty %}
-    {% if request.GET.q %}
-        <li>No tweets found with the search</li>
-    {% else %}
-        <li>No Tweets Yet</li>
-    {% endif %}
-{% endfor %}
+    <div id="app">
+        <div class="row">
+            <div class="col-sm-3" style="background-color: cyan">
+                <h3>{{ request.user }}</h3>
+            </div>
+
+            <div class="col-sm-9">
+                {%  if not request.GET.q %}
+                    {% include 'tweets/form.html' with form=create_form action_url=create_url btn_title='Tweet' %}
+                    <p v-if="!tweets.length">No Tweets yet </p>
+
+                {% endif %}
+
+                <p v-if="!tweets.length">No Tweets </p>
+                <div  v-for="obj in tweets" class="media">
+                    <div class="media-body">
+                        ${ obj.content }<br>
+                        via ${ obj.user.username } | ${ obj.updated } | ${ obj.timestamp } <a href='#'>View</a> <br>
+                    </div>
+                    <hr>
+                </div>
+
+            </div>
+        </div>
+    </div>
 {% endblock content %}

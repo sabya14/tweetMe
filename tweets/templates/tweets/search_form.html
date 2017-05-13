@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-    <form method="get" action="{% url "tweet:list" %}">
-     <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }} "/>
-        <input type="submit" value="Search"></form>
-    </form>
-</body>
-</html>
+{%  load crispy_forms_tags %}
+<form method="get" action="{% url "tweet:list" %}" class="navbar-form navbar-left">
+    <div class="form-group">
+        <label for="q">Search</label>
+        <input class="form-control"type="text" name="q" placeholder="Your search" value="{{ request.GET.q }}"/>
+        <input type="submit" class="btn btn-primary" value="Search">
+    </div>
+</form>
+

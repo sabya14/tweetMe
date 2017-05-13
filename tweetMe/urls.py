@@ -3,11 +3,12 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from .views import home
-
+from tweets.views import TweetListView
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$',home, name='base'),
+    url(r'^$',TweetListView.as_view(), name='base'),
     url(r'^tweets/', include('tweets.urls',namespace='tweet'), name='home'),
+    url(r'^tweets/api/', include('tweets.api.urls', namespace='tweet-api')),
 ]
 
 if settings.DEBUG:
