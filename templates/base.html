@@ -1,4 +1,5 @@
 {% load static %}
+{%  include 'navbar.html' %}
 <head>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href=" {% static 'css/bootstrap.min.css' %}">
@@ -12,8 +13,12 @@
 </div>
 
 <!-- jQuery library -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.1/vue.js"></script>
 
+<script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.1/axios.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+{% block script %} {% endblock script %}
 <!-- Latest compiled JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>

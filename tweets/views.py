@@ -5,6 +5,7 @@ from .forms import TweetModelForm
 from .mixins import FormUserNeededMixins,UserOwnerMixins
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.urls import reverse_lazy
 
 
 class TweetCreateView(FormUserNeededMixins, LoginRequiredMixin, CreateView):
@@ -41,6 +42,11 @@ class TweetListView(ListView):
             # return HttpResponseRedirect(q.get_absolute_url())
         return qs
 
+    def get_context_data(self, **kwargs):
+        context = super(TweetListView,self).get_context_data(**kwargs)
+        context['create_form'] = TweetModelForm()
+        context['create_url'] = reverse_lazy('tweet:create')
+        return context
 
 class TweetDeleteView(LoginRequiredMixin, UserOwnerMixins, DeleteView):
     queryset = Tweet.objects.all()
