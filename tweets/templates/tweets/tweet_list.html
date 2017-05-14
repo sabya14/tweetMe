@@ -36,7 +36,7 @@
         var config = {
             headers: {'X-CSRFToken': csrftoken}
         };
-
+        var newDate = new Date();
         var vm =  new Vue({
             router,
             el: '#app',
@@ -44,8 +44,45 @@
                 tweets: [],
                 query:'',
                 content:'',
+                searchq:'',
+                lastTime: Date.now()
+            },
+            computed: {
+                count : function () {
+                    return this.content.length
+                },
+
+
+
             },
             methods: {
+                searchAuto: function (e) {
+                    setTimeout(this.searchTweet(e),1000);
+                },
+                searchTweet : function(e){
+                    console.log("Called")
+                    e.preventDefault()
+                    $.ajax({
+                        url: '/tweets/api/?q=',
+                        data: {
+                            'q':this.searchq
+                        },
+                        method: 'GET',
+                        success: function (data) {
+                            $.each(data, function (key, value) {
+                                var tweetkey = key
+                                var tweetUser = value.user
+                                var tweetContent = value.content
+
+                            })
+                            vm.tweets = data;
+                            vm.query = q
+                        },
+                        error: function (data) {
+                            console.log('error')
+                        }
+                    })
+                },
                 postTweet : function (e) {
                     e.preventDefault()
                     content = this.content
@@ -112,7 +149,7 @@
 
 {% endblock script %}
 {% block content %}
-    <div id="app">
+    <div >
         <div class="row">
             <div class="col-sm-3" style="background-color: cyan">
                 <h3>{{ request.user }}</h3>
@@ -121,7 +158,10 @@
             <div class="col-sm-9">
                 {%  if not request.GET.q %}
                     {% include 'tweets/form.html' with form=create_form action_url=create_url btn_title='Tweet' %}
-                    <p v-if="!tweets.length">No Tweets yet </p>
+                    <span v-if="searchq == ''">
+                        <p v-if="!tweets.length">No Tweets yet </p>
+                    </span>
+
 
                 {% endif %}
 
@@ -129,7 +169,7 @@
                 <div  v-for="obj in tweets" class="media">
                     <div class="media-body">
                         ${ obj.content }<br>
-                        via ${ obj.user.username } | ${ obj.updated } | ${ obj.timestamp } <a href='#'>View</a> <br>
+                        via ${ obj.user.username } | ${ obj.date_display } | ${ obj.timesince } <a href='#'>View</a> <br>
                     </div>
                     <hr>
                 </div>
