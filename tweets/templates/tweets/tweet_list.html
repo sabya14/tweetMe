@@ -36,6 +36,11 @@
         var config = {
             headers: {'X-CSRFToken': csrftoken}
         };
+
+        function pageBottom() {
+            var result = false
+
+        }
         var newDate = new Date();
         var vm =  new Vue({
             router,
@@ -45,13 +50,14 @@
                 query:'',
                 content:'',
                 searchq:'',
-                lastTime: Date.now()
+                lastTime: Date.now(),
+                nextURL:'',
+
             },
             computed: {
                 count : function () {
                     return this.content.length
                 },
-
 
 
             },
@@ -69,13 +75,7 @@
                         },
                         method: 'GET',
                         success: function (data) {
-                            $.each(data, function (key, value) {
-                                var tweetkey = key
-                                var tweetUser = value.user
-                                var tweetContent = value.content
-
-                            })
-                            vm.tweets = data;
+                            vm.tweets = data.results;
                             vm.query = q
                         },
                         error: function (data) {
@@ -92,19 +92,15 @@
                             'username' : '{{ request.user }}',
                             'content' : content
                         },config) .then(function(response){
-
+                        console.log(response.data.id)
                         $.ajax({
-                            url: '/tweets/api/',
+                            url: '/tweets/api/?q=',
                             method: 'GET',
                             success: function (data) {
-                                $.each(data, function (key, value) {
-                                    var tweetkey = key
-                                    var tweetUser = value.user
-                                    var tweetContent = value.content
-
-                                })
-                                vm.tweets = data;
+                                console.log(data)
+                                vm.tweets =(data.results);
                                 vm.query = q
+                                vm.nextURL = data.next
                             },
                             error: function (data) {
                                 console.log('error')
@@ -117,30 +113,50 @@
             },
             delimiters:  ['${', '}'],
             mounted: function() {
-                q = this.$route.query.q
-                if (this.$route.query.q ==null)
-                    q = ''
 
+                q = this.$route.query.q
+                if (this.$route.query.q == null)
+                    q = ''
                 $.ajax({
                     url: '/tweets/api/?q=',
                     data: {
-                        'q':q
+                        'q': q
                     },
                     method: 'GET',
                     success: function (data) {
-                        $.each(data, function (key, value) {
-                            var tweetkey = key
-                            var tweetUser = value.user
-                            var tweetContent = value.content
+                        vm.tweets = data.results;
+                        vm.query = q;
+                        vm.nextURL = data.next;
 
-                        })
-                        vm.tweets = data;
-                        vm.query = q
                     },
                     error: function (data) {
                         console.log('error')
                     }
                 })
+                $(window ).scroll(function() {
+                    if(vm.nextURL!='/tweets/api/?q=') {
+                        if ($(window).scrollTop() + $(window)[0].innerHeight == ($(window).height())) {
+                            console.log(vm.nextURL)
+                            $.ajax({
+                                url: vm.nextURL,
+                                method: 'GET',
+                                success: function (data) {
+                                    vm.tweets = vm.tweets.concat(data.results);
+                                    console.log(vm.tweets.length);
+                                    if (data.next != null)
+                                        vm.nextURL = data.next;
+                                    else
+                                        vm.nextURL = '/tweets/api/?q='
+                                },
+                                error: function (data) {
+                                    console.log('error')
+                                }
+                            });
+                        }
+                    }
+                });
+
+
             },
 
         });
@@ -149,15 +165,17 @@
 
 {% endblock script %}
 {% block content %}
-    <div >
+    <div id="main-div">
         <div class="row">
             <div class="col-sm-3" style="background-color: cyan">
                 <h3>{{ request.user }}</h3>
             </div>
 
-            <div class="col-sm-9">
+            <div class="col-sm-9" id="secn_div">
                 {%  if not request.GET.q %}
+                    <span v-if="searchq == ''">
                     {% include 'tweets/form.html' with form=create_form action_url=create_url btn_title='Tweet' %}
+                    </span>
                     <span v-if="searchq == ''">
                         <p v-if="!tweets.length">No Tweets yet </p>
                     </span>

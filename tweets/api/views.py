@@ -2,10 +2,11 @@ from rest_framework import generics
 from tweets.models import Tweet
 from .serializers import TweetSerializer,TweetCreateSerializer
 from django.db.models  import Q
-
+from rest_framework import permissions
 
 class TweetList(generics.ListCreateAPIView):
     serializer_class = TweetSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self,*args,**kwargs):
         qs = Tweet.objects.all()
@@ -17,6 +18,18 @@ class TweetList(generics.ListCreateAPIView):
             # qs = Tweet.objects.get(id=query)
             # return HttpResponseRedirect(q.get_absolute_url())
         return qs
+
+class TweetSingle(generics.RetrieveAPIView):
+    serializer_class = TweetSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self, *args, **kwargs):
+        qs = Tweet.objects.all()
+        return qs
+
+
+
+
 
 
 class TweetCreate(generics.CreateAPIView):

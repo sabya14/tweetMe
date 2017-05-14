@@ -1,9 +1,14 @@
-{%  load crispy_forms_tags %}
 <form method="get" action="{% url "tweet:list" %}" class="navbar-form navbar-left">
     <div class="form-group">
         <label for="q">Search</label>
-        <input class="form-control"type="text" name="q" placeholder="Your search" value="{{ request.GET.q }}"/>
-        <input type="submit" class="btn btn-primary" value="Search">
+        <input class="form-control" id="search_form" type="text" v-model="searchq" v-on:keyup="searchAuto" name="q"  placeholder="Your search" />
+        <input @click="searchTweet" type="submit" class="btn btn-primary" value="Search">
     </div>
 </form>
+
+
+
+
+
+
 

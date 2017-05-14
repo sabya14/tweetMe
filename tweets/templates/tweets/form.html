@@ -2,7 +2,10 @@
 <form action="/tweets/create/ " method="post">
     <p>
         <input type='hidden' name='csrfmiddlewaretoken' value='s0jLiTANZIsj76HZmOqApWEda96k1joC68G3aq2kPj1SRoJlgeId9stKmf2ZN7wH' />
-        <textarea v-model="content" name="content" rows="10" id="id_content" placeholder="Your Message" required cols="40" class="form-control"></textarea>
+        <textarea id ="content-area" v-model="content"  name="content" rows="10" id="id_content" placeholder="Your Message" required cols="40" class="form-control"></textarea>
     </p>
     <input @click="postTweet" type="submit" class="btn btn-primary" value="Tweet" />
+    <span v-if="count<140" style="color:grey">  ${count}</span>
+    <span v-if="count==140" style="color:yellow">  ${count}</span>
+    <span v-if="count>140" style="color:red">  ${count}</span>
 </form>

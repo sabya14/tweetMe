@@ -21,3 +21,6 @@ class Tweet(models.Model):
         if content =='****':
             raise ValidationError("Cannot be four stars")
         return content
+
+    class Meta:
+        ordering = ['-timestamp','content']
