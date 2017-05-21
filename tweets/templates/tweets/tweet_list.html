@@ -67,6 +67,7 @@
                 },
                 searchTweet : function(e){
                     console.log("Called")
+
                     e.preventDefault()
                     $.ajax({
                         url: '/tweets/api/?q=',
@@ -85,7 +86,10 @@
                 },
                 postTweet : function (e) {
                     e.preventDefault()
-                    content = this.content
+                    var hashtagRegex = /(^|\s)#([\w\d-]+)/g
+                    var tweet = this.content.replace(hashtagRegex,"$1<a href='/tags/$2/'>#$2</a>");
+                    console.log(tweet)
+                    content = tweet
                     this.content = ""
                     axios.post('/tweets/api/create/',
                         {
@@ -179,15 +183,13 @@
                     <span v-if="searchq == ''">
                         <p v-if="!tweets.length">No Tweets yet </p>
                     </span>
-
-
-                {% endif %}
-
+                {% else %}
                 <p v-if="!tweets.length">No Tweets </p>
+                {% endif %}
                 <div  v-for="obj in tweets" class="media">
-                    <div class="media-body">
+                    <div v-html="obj.content" class="media-body">
                         ${ obj.content }<br>
-                        via ${ obj.user.username } | ${ obj.date_display } | ${ obj.timesince } <a href='#'>View</a> <br>
+                        via  <a :href="obj.user.url">${ obj.user.username }</a> | ${ obj.date_display } | ${ obj.timesince } <a href='#'>View</a> <br>
                     </div>
                     <hr>
                 </div>

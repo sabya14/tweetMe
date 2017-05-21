@@ -1,0 +1,43 @@
+
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-3" style="background-color: cyan">
+            <h3>{{ object.username }}</h3>
+            <h6>Followers:{{ object.followed_by.all.count }}</h6>
+            <a href="{{ object.profile.get_following_url }}">
+                {% if following %}
+                    Unfollow
+                {% else %}
+                    Follow
+                {% endif %}</a>
+
+        </div>
+        <div class="col-sm-9">
+            <h1>Tweets</h1>
+            {% for tweet in  object.tweet_set.all %}
+                {{ tweet }}<br/>
+            {% empty %}
+                No tweets
+            {% endfor %}
+            <h1>Following ({{object.profile.get_following.count}})</h1>
+
+            {% for user in  object.profile.get_following %}
+                <a href="javascript:window.location.href=urlChangeLastParam('{{user}}')">{{ user }}</a><br/>
+            {% empty %}
+                Following None
+
+            {% endfor %}
+            <h1>Followed By </h1>
+            {% for user in  object.followed_by.all %}
+                {{ user.user }}<br/>
+            {% empty %}
+                No followers
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+{% endblock content %}
