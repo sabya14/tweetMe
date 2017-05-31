@@ -52,6 +52,8 @@
                 searchq:'',
                 lastTime: Date.now(),
                 nextURL:'',
+                hashtags: [],
+                hash: false
 
             },
             computed: {
@@ -83,6 +85,17 @@
                             console.log('error')
                         }
                     })
+                },
+                searchTagTweet : function(e){
+                    query = e.srcElement.innerHTML
+                    for(tags in vm.hashtags)
+                        if(vm.hashtags[tags]['tag'] == query){
+                            console.log(vm.hashtags[tags]['tweet_content'])
+                            vm.tweets = vm.hashtags[tags]['tweet_content']
+                            vm.hash = true
+                        }
+
+
                 },
                 postTweet : function (e) {
                     e.preventDefault()
@@ -137,6 +150,17 @@
                         console.log('error')
                     }
                 })
+                $.ajax({
+                    url: '/tweets/tags/',
+                    method: 'GET',
+                    success: function (data) {
+                        vm.hashtags = data.results
+                        console.log(data)
+                    },
+                    error: function (data) {
+                        console.log('error')
+                    }
+                })
                 $(window ).scroll(function() {
                     if(vm.nextURL!='/tweets/api/?q=') {
                         if ($(window).scrollTop() + $(window)[0].innerHeight == ($(window).height())) {
@@ -171,8 +195,16 @@
 {% block content %}
     <div id="main-div">
         <div class="row">
-            <div class="col-sm-3" style="background-color: cyan">
-                <h3>{{ request.user }}</h3>
+            <div class="col-sm-3" >
+                <div class="row" style="background-color: cyan">
+                    <h3>&nbsp{{ request.user }}</h3>
+                </div>
+                <br>
+                <div class="row" >
+                    <span v-for="tag in hashtags">
+                    <button @click='searchTagTweet' style="margin: 2px;" type="button" class="btn btn-primary">${ tag.tag }</button>
+                    </span>
+                </div>
             </div>
 
             <div class="col-sm-9" id="secn_div">
@@ -184,12 +216,16 @@
                         <p v-if="!tweets.length">No Tweets yet </p>
                     </span>
                 {% else %}
-                <p v-if="!tweets.length">No Tweets </p>
+                    <p v-if="!tweets.length">No Tweets </p>
                 {% endif %}
                 <div  v-for="obj in tweets" class="media">
-                    <div v-html="obj.content" class="media-body">
+                    <div v-if="!hash" v-html="obj.content" class="media-body">
                         ${ obj.content }<br>
                         via  <a :href="obj.user.url">${ obj.user.username }</a> | ${ obj.date_display } | ${ obj.timesince } <a href='#'>View</a> <br>
+                    </div>
+                    <div v-else v-html="obj.content" class="media-body">
+                        ${ obj.content }<br>
+
                     </div>
                     <hr>
                 </div>

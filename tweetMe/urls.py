@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^$',TweetListView.as_view(), name='base'),
     url(r'^tweets/', include('tweets.urls',namespace='tweet'), name='home'),
     url(r'^tweets/api/', include('tweets.api.urls', namespace='tweet-api')),
+    url(r'^tweets/tags/', include('hashtags.urls', namespace='tags')),
     url(r'^tweets/accounts/', include('accounts.urls', namespace='accounts')),
 ]
 
